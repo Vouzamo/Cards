@@ -19,6 +19,8 @@ namespace Vouzamo.Cards.Core
 
             if (TryGetFourOfAKind(cards, out Hand fourOfAKind))
             {
+                ApplyKickers(fourOfAKind, cards);
+
                 return fourOfAKind;
             }
 
