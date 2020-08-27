@@ -3,12 +3,20 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Vouzamo.Cards.Core;
+using Vouzamo.Cards.Poker;
 
 namespace Vouzamo.Cards.Tests
 {
     [TestClass]
     public class CardTests
     {
+        private IHandEvaluator HandEvaluator { get; }
+
+        public CardTests()
+        {
+            HandEvaluator = new PokerHandEvaluator();
+        }
+
         [TestMethod]
         public void Sorting()
         {
@@ -47,7 +55,7 @@ namespace Vouzamo.Cards.Tests
 
             var hand = HandEvaluator.Evaluate(cards);
 
-            Assert.AreEqual(HandRankings.RoyalFlush, hand.Ranking);
+            Assert.AreEqual(HandRankings.RoyalFlush.ToString(), hand.Ranking);
         }
 
         [TestMethod]
@@ -66,7 +74,7 @@ namespace Vouzamo.Cards.Tests
 
             var hand = HandEvaluator.Evaluate(cards);
 
-            Assert.AreEqual(HandRankings.StraightFlush, hand.Ranking);
+            Assert.AreEqual(HandRankings.StraightFlush.ToString(), hand.Ranking);
         }
 
         [TestMethod]
@@ -85,7 +93,7 @@ namespace Vouzamo.Cards.Tests
 
             var hand = HandEvaluator.Evaluate(cards);
 
-            Assert.AreEqual(HandRankings.FourOfAKind, hand.Ranking);
+            Assert.AreEqual(HandRankings.FourOfAKind.ToString(), hand.Ranking);
         }
 
         [TestMethod]
@@ -104,7 +112,7 @@ namespace Vouzamo.Cards.Tests
 
             var hand = HandEvaluator.Evaluate(cards);
 
-            Assert.AreEqual(HandRankings.FullHouse, hand.Ranking);
+            Assert.AreEqual(HandRankings.FullHouse.ToString(), hand.Ranking);
         }
 
         [TestMethod]
@@ -123,7 +131,7 @@ namespace Vouzamo.Cards.Tests
 
             var hand = HandEvaluator.Evaluate(cards);
 
-            Assert.AreEqual(HandRankings.Flush, hand.Ranking);
+            Assert.AreEqual(HandRankings.Flush.ToString(), hand.Ranking);
         }
 
         [TestMethod]
@@ -142,7 +150,7 @@ namespace Vouzamo.Cards.Tests
 
             var hand = HandEvaluator.Evaluate(cards);
 
-            Assert.AreEqual(HandRankings.Straight, hand.Ranking);
+            Assert.AreEqual(HandRankings.Straight.ToString(), hand.Ranking);
         }
 
         [TestMethod]
@@ -161,7 +169,7 @@ namespace Vouzamo.Cards.Tests
 
             var hand = HandEvaluator.Evaluate(cards);
 
-            Assert.AreEqual(HandRankings.ThreeOfAKind, hand.Ranking);
+            Assert.AreEqual(HandRankings.ThreeOfAKind.ToString(), hand.Ranking);
             Assert.AreEqual(Ranks.Ten, hand.Cards.Last().Rank);
         }
 
@@ -181,7 +189,7 @@ namespace Vouzamo.Cards.Tests
 
             var hand = HandEvaluator.Evaluate(cards);
 
-            Assert.AreEqual(HandRankings.TwoPair, hand.Ranking);
+            Assert.AreEqual(HandRankings.TwoPair.ToString(), hand.Ranking);
             Assert.AreEqual(Ranks.Ten, hand.Cards.Last().Rank);
         }
 
@@ -201,7 +209,7 @@ namespace Vouzamo.Cards.Tests
 
             var hand = HandEvaluator.Evaluate(cards);
 
-            Assert.AreEqual(HandRankings.Pair, hand.Ranking);
+            Assert.AreEqual(HandRankings.Pair.ToString(), hand.Ranking);
             Assert.AreEqual(Ranks.Six, hand.Cards.Last().Rank);
         }
 
@@ -221,47 +229,8 @@ namespace Vouzamo.Cards.Tests
 
             var hand = HandEvaluator.Evaluate(cards);
 
-            Assert.AreEqual(HandRankings.HighCard, hand.Ranking);
+            Assert.AreEqual(HandRankings.HighCard.ToString(), hand.Ranking);
             Assert.AreEqual(Ranks.Six, hand.Cards.Last().Rank);
-        }
-
-        [TestMethod]
-        public void ValueTests()
-        {
-            var deck = new Deck();
-
-            deck.Shuffle();
-
-            if(deck.TryDeal(2, out var player1) && deck.TryDeal(2, out var player2))
-            {
-                if(deck.TryDeal(3, out var flop) && deck.TryDeal(1, out var turn) && deck.TryDeal(1, out var river))
-                {
-                    var player1hand = new List<Card>();
-                    player1hand.AddRange(player1);
-                    player1hand.AddRange(flop);
-                    player1hand.AddRange(turn);
-                    player1hand.AddRange(river);
-
-                    var player2hand = new List<Card>();
-                    player2hand.AddRange(player2);
-                    player2hand.AddRange(flop);
-                    player2hand.AddRange(turn);
-                    player2hand.AddRange(river);
-
-                    Assert.AreEqual(7, player1hand.Count);
-                    Assert.AreEqual(7, player2hand.Count);
-                }
-            }
-
-            while(deck.TryDeal(5, out var hand))
-            {
-                foreach(var card in hand)
-                {
-                    Debug.WriteLine(card);
-                }
-            }
-
-            Assert.AreEqual(2, deck.Count);
         }
     }
 }

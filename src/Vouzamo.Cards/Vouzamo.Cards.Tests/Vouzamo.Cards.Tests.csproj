@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Vouzamo.Cards.Core\Vouzamo.Cards.Core.csproj" />
+    <ProjectReference Include="..\Vouzamo.Cards.Poker\Vouzamo.Cards.Poker.csproj" />
   </ItemGroup>
 
 </Project>

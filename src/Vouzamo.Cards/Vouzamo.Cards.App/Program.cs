@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Vouzamo.Cards.Core;
+using Vouzamo.Cards.Poker;
 
 namespace Vouzamo.Cards.App
 {
@@ -8,12 +10,14 @@ namespace Vouzamo.Cards.App
     {
         static void Main(string[] args)
         {
+            var pokerHandEvaluator = new PokerHandEvaluator();
+
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             Console.CursorSize = 24;
 
-            ConsoleKeyInfo key = Console.ReadKey();
+            ConsoleKeyInfo key;
 
             do
             {
@@ -26,10 +30,13 @@ namespace Vouzamo.Cards.App
                 {
                     if (deck.TryDeal(3, out var flop) && deck.TryDeal(1, out var turn) && deck.TryDeal(1, out var river))
                     {
+                        var turnCard = turn.Single();
+                        var riverCard = river.Single();
+
                         var communityCards = new List<Card>();
                         communityCards.AddRange(flop);
-                        communityCards.AddRange(turn);
-                        communityCards.AddRange(river);
+                        communityCards.Add(turnCard);
+                        communityCards.Add(riverCard);
 
                         var player1hand = new List<Card>();
                         player1hand.AddRange(player1);
@@ -40,14 +47,18 @@ namespace Vouzamo.Cards.App
                         player2hand.AddRange(communityCards);
 
                         Console.WriteLine("Community Cards:");
-                        foreach (var card in communityCards)
+                        foreach (var card in flop)
                         {
                             OutputCard(card);
                         }
+                        Console.Write("  ");
+                        OutputCard(turnCard);
+                        Console.Write("  ");
+                        OutputCard(riverCard);
                         Console.WriteLine();
 
-                        var player1evaluatedHand = HandEvaluator.Evaluate(player1hand);
-                        var player2evaluatedHand = HandEvaluator.Evaluate(player2hand);
+                        var player1evaluatedHand = pokerHandEvaluator.Evaluate(player1hand);
+                        var player2evaluatedHand = pokerHandEvaluator.Evaluate(player2hand);
 
                         Console.WriteLine("Player One:");
                         foreach(var card in player1)

@@ -1,13 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Vouzamo.Cards.Core\Vouzamo.Cards.Core.csproj" />
-    <ProjectReference Include="..\Vouzamo.Cards.Poker\Vouzamo.Cards.Poker.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,18 +1,21 @@
 ﻿using System.Collections.Generic;
+using Vouzamo.Cards.Core;
 
-namespace Vouzamo.Cards.Core
+namespace Vouzamo.Cards.Poker
 {
-    public class Hand
+
+    public class PokerHand : IHand
     {
         public int Score => CalculateScore();
+        public string Ranking => HandRanking.ToString();
 
         public List<Card> Cards { get; set; }
-        public HandRankings Ranking { get; set; }
+        public HandRankings HandRanking { get; set; }
 
-        public Hand(List<Card> cards, HandRankings ranking)
+        public PokerHand(List<Card> cards, HandRankings handRanking)
         {
             Cards = cards;
-            Ranking = ranking;
+            HandRanking = handRanking;
         }
 
         /// <summary>
@@ -28,7 +31,7 @@ namespace Vouzamo.Cards.Core
         {
             var score = 0;
 
-            score += (int)Ranking << 20;
+            score += (int)HandRanking << 20;
 
             score += (int)Cards[0].Rank << 16;
             score += (int)Cards[1].Rank << 12;

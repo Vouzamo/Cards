@@ -1,59 +1,60 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Vouzamo.Cards.Core;
 
-namespace Vouzamo.Cards.Core
+namespace Vouzamo.Cards.Poker
 {
-    public static class HandEvaluator
+    public class PokerHandEvaluator : IHandEvaluator
     {
-        public static Hand Evaluate(IEnumerable<Card> cards)
+        public IHand Evaluate(IEnumerable<Card> cards)
         {
-            if(TryGetRoyalFlush(cards, out Hand royalFlush))
+            if(TryGetRoyalFlush(cards, out IHand royalFlush))
             {
                 return royalFlush;
             }
 
-            if (TryGetStraightFlush(cards, out Hand straightFlush))
+            if (TryGetStraightFlush(cards, out IHand straightFlush))
             {
                 return straightFlush;
             }
 
-            if (TryGetFourOfAKind(cards, out Hand fourOfAKind))
+            if (TryGetFourOfAKind(cards, out IHand fourOfAKind))
             {
                 ApplyKickers(fourOfAKind, cards);
 
                 return fourOfAKind;
             }
 
-            if (TryGetFullHouse(cards, out Hand fullHouse))
+            if (TryGetFullHouse(cards, out IHand fullHouse))
             {
                 return fullHouse;
             }
 
-            if (TryGetFlush(cards, out Hand flush))
+            if (TryGetFlush(cards, out IHand flush))
             {
                 return flush;
             }
 
-            if (TryGetStraight(cards, out Hand straight))
+            if (TryGetStraight(cards, out IHand straight))
             {
                 return straight;
             }
 
-            if (TryGetThreeOfAKind(cards, out Hand threeOfAKind))
+            if (TryGetThreeOfAKind(cards, out IHand threeOfAKind))
             {
                 ApplyKickers(threeOfAKind, cards);
 
                 return threeOfAKind;
             }
 
-            if (TryGetTwoPair(cards, out Hand twoPair))
+            if (TryGetTwoPair(cards, out IHand twoPair))
             {
                 ApplyKickers(twoPair, cards);
 
                 return twoPair;
             }
 
-            if (TryGetPair(cards, out Hand pair))
+            if (TryGetPair(cards, out IHand pair))
             {
                 ApplyKickers(pair, cards);
 
@@ -67,18 +68,16 @@ namespace Vouzamo.Cards.Core
             return highCard;
         }
 
-        private static void ApplyKickers(Hand hand, IEnumerable<Card> cards)
+        private static void ApplyKickers(IHand hand, IEnumerable<Card> cards)
         {
             var remainingCards = cards.Where(c => !hand.Cards.Contains(c));
 
             var kickers = remainingCards.SortAcesHigh().Take(5 - hand.Cards.Count());
 
-            // Modify hand.Score based on kickers
-
             hand.Cards.AddRange(kickers);
         }
 
-        private static bool TryGetRoyalFlush(IEnumerable<Card> cards, out Hand hand)
+        private static bool TryGetRoyalFlush(IEnumerable<Card> cards, out IHand hand)
         {
             hand = default;
 
@@ -86,7 +85,7 @@ namespace Vouzamo.Cards.Core
 
             foreach(var suit in suited)
             {
-                hand = new Hand(suit.SortAcesHigh().Take(5).ToList(), HandRankings.RoyalFlush);
+                hand = new PokerHand(suit.SortAcesHigh().Take(5).ToList(), HandRankings.RoyalFlush);
 
                 if (hand.Cards.Count == 5 && hand.Cards.First().Rank == Ranks.Ace && hand.Cards.Last().Rank == Ranks.Ten)
                 {
@@ -97,7 +96,7 @@ namespace Vouzamo.Cards.Core
             return false;
         }
 
-        private static bool TryGetStraightFlush(IEnumerable<Card> cards, out Hand hand)
+        private static bool TryGetStraightFlush(IEnumerable<Card> cards, out IHand hand)
         {
             hand = default;
 
@@ -109,7 +108,7 @@ namespace Vouzamo.Cards.Core
 
                 if (sorted.TryGetStraight(out var straight))
                 {
-                    hand = new Hand(straight, HandRankings.StraightFlush);
+                    hand = new PokerHand(straight, HandRankings.StraightFlush);
 
                     return true;
                 }
@@ -118,7 +117,7 @@ namespace Vouzamo.Cards.Core
             return false;
         }
 
-        private static bool TryGetFourOfAKind(IEnumerable<Card> cards, out Hand hand)
+        private static bool TryGetFourOfAKind(IEnumerable<Card> cards, out IHand hand)
         {
             hand = default;
 
@@ -128,7 +127,7 @@ namespace Vouzamo.Cards.Core
             {
                 if(rank.Count() >= 4)
                 {
-                    hand = new Hand(rank.Take(4).ToList(), HandRankings.FourOfAKind);
+                    hand = new PokerHand(rank.Take(4).ToList(), HandRankings.FourOfAKind);
 
                     return true;
                 }
@@ -137,7 +136,7 @@ namespace Vouzamo.Cards.Core
             return false;
         }
 
-        private static bool TryGetFullHouse(IEnumerable<Card> cards, out Hand hand)
+        private static bool TryGetFullHouse(IEnumerable<Card> cards, out IHand hand)
         {
             hand = default;
 
@@ -150,7 +149,7 @@ namespace Vouzamo.Cards.Core
                     var fullHouse = threeOfAKind.Cards;
                     fullHouse.AddRange(pair.Cards);
 
-                    hand = new Hand(fullHouse, HandRankings.FullHouse);
+                    hand = new PokerHand(fullHouse, HandRankings.FullHouse);
 
                     return true;
                 }
@@ -159,7 +158,7 @@ namespace Vouzamo.Cards.Core
             return false;
         }
 
-        private static bool TryGetFlush(IEnumerable<Card> cards, out Hand hand)
+        private static bool TryGetFlush(IEnumerable<Card> cards, out IHand hand)
         {
             hand = default;
 
@@ -169,7 +168,7 @@ namespace Vouzamo.Cards.Core
             {
                 if(suit.Count() >= 5)
                 {
-                    hand = new Hand(suit.SortAcesHigh().Take(5).ToList(), HandRankings.Flush);
+                    hand = new PokerHand(suit.SortAcesHigh().Take(5).ToList(), HandRankings.Flush);
 
                     return true;
                 }
@@ -178,7 +177,7 @@ namespace Vouzamo.Cards.Core
             return false;
         }
 
-        private static bool TryGetStraight(IEnumerable<Card> cards, out Hand hand)
+        private static bool TryGetStraight(IEnumerable<Card> cards, out IHand hand)
         {
             hand = default;
 
@@ -186,7 +185,7 @@ namespace Vouzamo.Cards.Core
 
             if(sorted.TryGetStraight(out var straight))
             {
-                hand = new Hand(straight, HandRankings.Straight);
+                hand = new PokerHand(straight, HandRankings.Straight);
             }
             else
             {
@@ -194,14 +193,14 @@ namespace Vouzamo.Cards.Core
 
                 if (sorted.TryGetStraight(out straight))
                 {
-                    hand = new Hand(straight, HandRankings.Straight);
+                    hand = new PokerHand(straight, HandRankings.Straight);
                 }
             }
 
             return hand != default;
         }
 
-        private static bool TryGetThreeOfAKind(IEnumerable<Card> cards, out Hand hand)
+        private static bool TryGetThreeOfAKind(IEnumerable<Card> cards, out IHand hand)
         {
             hand = default;
 
@@ -211,7 +210,7 @@ namespace Vouzamo.Cards.Core
             {
                 if (rank.Count() >= 3)
                 {
-                    hand = new Hand(rank.Take(3).ToList(), HandRankings.ThreeOfAKind);
+                    hand = new PokerHand(rank.Take(3).ToList(), HandRankings.ThreeOfAKind);
 
                     return true;
                 }
@@ -220,7 +219,7 @@ namespace Vouzamo.Cards.Core
             return false;
         }
 
-        private static bool TryGetTwoPair(IEnumerable<Card> cards, out Hand hand)
+        private static bool TryGetTwoPair(IEnumerable<Card> cards, out IHand hand)
         {
             hand = default;
 
@@ -233,7 +232,7 @@ namespace Vouzamo.Cards.Core
                     var twoPair = firstPair.Cards;
                     twoPair.AddRange(secondPair.Cards);
 
-                    hand = new Hand(twoPair, HandRankings.TwoPair);
+                    hand = new PokerHand(twoPair, HandRankings.TwoPair);
 
                     return true;
                 }
@@ -242,7 +241,7 @@ namespace Vouzamo.Cards.Core
             return false;
         }
 
-        private static bool TryGetPair(IEnumerable<Card> cards, out Hand hand)
+        private static bool TryGetPair(IEnumerable<Card> cards, out IHand hand)
         {
             hand = default;
 
@@ -252,7 +251,7 @@ namespace Vouzamo.Cards.Core
             {
                 if (rank.Count() >= 2)
                 {
-                    hand = new Hand(rank.Take(2).ToList(), HandRankings.Pair);
+                    hand = new PokerHand(rank.Take(2).ToList(), HandRankings.Pair);
 
                     return true;
                 }
@@ -261,9 +260,9 @@ namespace Vouzamo.Cards.Core
             return false;
         }
 
-        private static Hand GetHighCard(IEnumerable<Card> cards)
+        private static IHand GetHighCard(IEnumerable<Card> cards)
         {
-            return new Hand(cards.SortAcesHigh().Take(5).ToList(), HandRankings.HighCard);
+            return new PokerHand(cards.SortAcesHigh().Take(5).ToList(), HandRankings.HighCard);
         }
     }
 }
